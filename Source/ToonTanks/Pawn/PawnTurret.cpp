@@ -21,6 +21,7 @@ void APawnTurret::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//Check player is in the fire range,if yes ,then rotate the turret toward player.
 	if (!PlayerPawn || GetDistanceToPlayer() > FireRange)
 	{
 		return;
@@ -38,14 +39,14 @@ void APawnTurret::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 void APawnTurret::CheckFireCondition()
 {
 	//If player == null  ||  is Dead THEN BAIL!!
-	if (!PlayerPawn)
+	if (!PlayerPawn || !PlayerPawn->GetIsPlayerAlive())
 	{
 		return;
 	}
 	//If Player is in range THEN FIRE!!
 	if (GetDistanceToPlayer() <= FireRange)
 	{
-		/*Fire();*/
+		Fire();
 	}
 }
 
@@ -59,8 +60,8 @@ float APawnTurret::GetDistanceToPlayer()
 	return FVector::Dist(PlayerPawn->GetActorLocation(), GetActorLocation());
 }
 
-void APawnTurret::HandleDestroyed()
+void APawnTurret::HandleDestruction()
 {
-	Super::HandleDestroyed();
+	Super::HandleDestruction();
 	Destroy();
 }

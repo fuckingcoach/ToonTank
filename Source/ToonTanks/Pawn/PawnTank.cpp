@@ -10,7 +10,7 @@ APawnTank::APawnTank()
 {
 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	// Set Components.
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));
 	SpringArm->SetupAttachment(RootComponent);
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
@@ -25,8 +25,14 @@ void APawnTank::BeginPlay()
 	PlayerControllerRef = Cast<APlayerController>(GetController());
 }
 
-void APawnTank::HandleDestroyed()
+// If player has been destroyed,hide it.
+void APawnTank::HandleDestruction()
 {
+	Super::HandleDestruction();
+
+	bIsPlayerAlive = false;
+	SetActorHiddenInGame(true);
+	SetActorTickEnabled(false);
 }
 
 // Called every frame
@@ -37,6 +43,7 @@ void APawnTank::Tick(float DeltaTime)
 	Move();
 	Rotate();
 
+	// Let turret rotate toward mouse cursor.
 	if (PlayerControllerRef)
 	{
 		FHitResult TraceHitResult;
@@ -54,8 +61,13 @@ void APawnTank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &APawnTank::CalculateMove);
 	PlayerInputComponent->BindAxis("Turn", this, &APawnTank::CalculateRotate);
-	//PlayerInputComponent->BindAction("Fire",IE_Pressed,this,&APawnTank::Fire);
+	PlayerInputComponent->BindAction("Fire",IE_Pressed,this,&APawnTank::Fire);
 
+}
+
+bool APawnTank::GetIsPlayerAlive()
+{
+	return bIsPlayerAlive;
 }
 
 void APawnTank::Move()

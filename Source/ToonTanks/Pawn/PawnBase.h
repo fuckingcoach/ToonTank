@@ -5,10 +5,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "ToonTanks/Actors/ProjectileBase.h"
+#include "Particles/ParticleSystem.h"
 #include "PawnBase.generated.h"
 
 class UCapsuleComponent;
 class AProjectileBase;
+class UHealthComponent;
 
 UCLASS()
 class TOONTANKS_API APawnBase : public APawn
@@ -16,7 +18,7 @@ class TOONTANKS_API APawnBase : public APawn
 	GENERATED_BODY()
 
 private:
-
+	//Components
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,category = "Components", meta = (AllowPrivateAccess = "true"));
 	UCapsuleComponent* CapsuleComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Components", meta = (AllowPrivateAccess = "true"));
@@ -25,9 +27,18 @@ private:
 	UStaticMeshComponent* TurretMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Components", meta = (AllowPrivateAccess = "true"));
 	USceneComponent* ProjectileSpawnPoint;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Components", meta = (AllowPrivateAccess = "true"));
+	UHealthComponent* HealthComponent;
 
-	/*UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "Projectile Type", meta = (AllowPrivateAccess = "true"));
-	TSubclassOf<AProjectileBase> ProjectileClass;*/
+	//Variables
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "Projectile Type", meta = (AllowPrivateAccess = "true"));
+	TSubclassOf<AProjectileBase> ProjectileClass;
+	UPROPERTY(EditAnywhere, category = "Effects");
+	UParticleSystem* DeathParticle;
+	UPROPERTY(EditAnywhere, category = "Effects");
+	USoundBase* DeathSound;
+	UPROPERTY(EditAnywhere, category = "Effects");
+	TSubclassOf<UCameraShake> DeathShake;
 
 public:
 
@@ -35,20 +46,18 @@ public:
 	// Sets default values for this pawn's properties
 	APawnBase();
 
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	//FUNCTIONS
+	virtual void HandleDestruction();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	//FUNCTIONS
 	void RotateTurret(FVector LookAtTarget);
 
 	void Fire();
 
-	virtual void HandleDestroyed();
+	
 
 };
